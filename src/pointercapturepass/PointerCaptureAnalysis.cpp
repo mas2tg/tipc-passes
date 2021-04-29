@@ -41,75 +41,26 @@ bool PointerCapturePass::runOnSCC(CallGraphSCC &SCC) {
     	errs() << "Visiting function: " << F->getName() << "\n";
 	for (BasicBlock& bb: *F){
 	    for (Instruction& i: bb){
-	         //if(isSupported(i)){
 		errs() << "Looking at " << i << " " << i.getOpcode() << "\n";
 		
 		if (i.getOpcode() == 56 ){ // 56 corresponds to Inst::Call 
-			CallBase* alloc_call = cast<CallBase>(&i); // NEED to get underlying value from interator first, then its reference
-			//errs() << "    about to call getName("<< alloc_call->getCalledFunction() <<" )\n";
-
+			CallBase* alloc_call = cast<CallBase>(&i); 
 			if (alloc_call->getCalledFunction() != NULL && alloc_call->getCalledFunction()->getName().endswith("alloc")){
-				// errs() << *iter_i << " " << (iter_i)->getOpcode() << "\n";
-				//errs() << "about to "
-				// alloc_i = &(*iter_i);
-				if (PointerMayBeCaptured(&i, false, true)){ //2nd: return; 3rd: stored
-					errs() << "    This pointer " << i << " is captured!\n";
-					//callocPresent = true; //False positive?
+				if (PointerMayBeCaptured(alloc_call, false, false)){ //2nd: return is captured; 3rd: any stored is captured 
+					errs() << "    This pointer " << i << " is captured!\n"; 
 				}
 			}
 		}
-	         //}		     
+		if (i.getOpcode() == 47){ // 47 corresponds to ptrtoint
+				if (PointerMayBeCaptured(&i, false, false)){ 
+					errs() << "    This pointer " << i << " is captured!\n";	
+				}
+		}
 	    }
 	}
 	
     }
 
-/*
-    errs() << "Visiting function: " << F.getName() << "\n";
-    Instruction* ret_i;
-    Instruction* alloc_i;
-    bool callocPresent = false;
-    
-    // BACKWARDS (based on https://stackoverflow.com/questions/44274857/iterating-over-basic-blocks-in-reverse-in-llvm-function) 
-    auto bb_list = &(F.getBasicBlockList());
-    for (auto iter_bb = bb_list->rbegin(); iter_bb != bb_list->rend(); ++iter_bb){
-	auto inst_list = &(iter_bb->getInstList());
-	for (auto iter_i = inst_list->rbegin(); iter_i != inst_list->rend(); ++iter_i){
-		errs() << "Looking at " << *iter_i << " " << (iter_i)->getOpcode() << "\n";
-		
-    		//WE LOOK FOR ret here
-		if (iter_i->getOpcode() == 1){ 
-			//errs() << *iter_i << " " << (iter_i)->getOpcode() << "\n";
-			ret_i = &(*iter_i);
-		}
-		
-		//THIS WORKS 
-		if (iter_i->getOpcode() == 56 ){ // 56 corresponds to Inst::Call 
-			CallBase* alloc_call = cast<CallBase>(&(*iter_i)); // NEED to get underlying value from interator first, then its reference
-			//errs() << "    about to call getName("<< alloc_call->getCalledFunction() <<" )\n";
-
-			if (alloc_call->getCalledFunction() != NULL && alloc_call->getCalledFunction()->getName().endswith("alloc")){
-				// errs() << *iter_i << " " << (iter_i)->getOpcode() << "\n";
-				//errs() << "about to "
-				alloc_i = &(*iter_i);
-				if (PointerMayBeCaptured(alloc_i, false, false)){ //2nd: return; 3rd: stored
-					errs() << "    This pointer is captured!\n";
-					callocPresent = true; //False positive?
-				}
-			}
-		}
-		
-
-	}
-    }
-
-    if (callocPresent){
-   	 errs() << "Adding free()...\n";
-   	 // add free
-	 // REMEMBER: this pass does not work interprocedurally! alloc_i will never be called 
-   	 CallInst::CreateFree( cast<Value>(alloc_i), ret_i); // insert before ret_i
-    }
-    */
     errs() << "\n";
 
 
