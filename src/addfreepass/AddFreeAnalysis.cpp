@@ -58,7 +58,6 @@ bool AddFreePass::runOnFunction(Function &F) {
 
 			if (alloc_call->getCalledFunction() != NULL && alloc_call->getCalledFunction()->getName().endswith("alloc")){
 				// errs() << *iter_i << " " << (iter_i)->getOpcode() << "\n";
-				//errs() << "about to "
 				alloc_i = &(*iter_i);
 				if (PointerMayBeCaptured(alloc_i, false, false)){ //2nd: return; 3rd: stored
 					errs() << "    This pointer is captured!\n";
@@ -66,22 +65,16 @@ bool AddFreePass::runOnFunction(Function &F) {
 				}
 			}
 		}
-		
-
 	}
     }
 
     if (callocPresent){
    	 errs() << "Adding free()...\n";
    	 // add free
-	 // REMEMBER: this pass does not work interprocedurally! alloc_i will never be called 
+	 // REMEMBER: this pass does not work interprocedurally! 
    	 CallInst::CreateFree( cast<Value>(alloc_i), ret_i); // insert before ret_i
     }
     errs() << "\n";
-    
-    
-    
-    
 
     /* FORWARD
     for (BasicBlock& bb: F){
@@ -92,6 +85,7 @@ bool AddFreePass::runOnFunction(Function &F) {
         }
     }
     */
+
     return false; 
 }
 
