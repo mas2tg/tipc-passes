@@ -1,0 +1,21 @@
+bar(){
+	var z;
+	z = alloc 99; // should not outlive the call
+	output *z + 1; 
+	return 0; 
+}
+
+foo(){
+	var y, z;
+	y = alloc 42; // should be captured since it outlives the call
+	z = bar();
+	return y;
+}
+
+
+main(){
+	var x;
+	x = foo();
+	output *x;
+	return 0;
+}

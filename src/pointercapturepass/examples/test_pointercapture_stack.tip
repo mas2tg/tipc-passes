@@ -1,0 +1,10 @@
+foo(){
+	return 42;
+}
+
+main(){
+	var x, y;
+	x = foo();
+	y = &x;
+	return x;
+}
