@@ -56,8 +56,8 @@ bool PointerCapturePass::runOnSCC(CallGraphSCC &SCC) {
 					errs() << "    This pointer " << i << " is captured!\n";	
 				}
 		}
-		for (const User *U : i.users()) {
-			errs() << "    user:" << *U << "\n";
+		for (const Use &U : i.uses()) {
+			errs() << "    user:" << *(U.getUser()) << "; with operandNo:" << U.getOperandNo() << "\n";
 		}
 
 
