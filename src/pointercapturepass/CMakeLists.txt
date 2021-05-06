@@ -1,1 +1,1 @@
-add_llvm_library(poitercapturepass MODULE PointerCaptureAnalysis.cpp)
+add_llvm_library(pointercapturepass MODULE PointerCaptureAnalysis.cpp)

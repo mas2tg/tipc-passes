@@ -42,19 +42,11 @@ bool PointerCapturePass::runOnSCC(CallGraphSCC &SCC) {
 	for (BasicBlock& bb: *F){
 	    for (Instruction& i: bb){
 		errs() << "Looking at " << i << " " << i.getOpcode() << "\n";
-		
-		if (i.getOpcode() == 56 ){ // 56 corresponds to Inst::Call 
-			CallBase* alloc_call = cast<CallBase>(&i); 
-			if (alloc_call->getCalledFunction() != NULL && alloc_call->getCalledFunction()->getName().endswith("alloc")){
-				if (PointerMayBeCaptured(alloc_call, false, false)){ //2nd: return is captured; 3rd: any stored is captured 
-					errs() << "    This pointer " << i << " is captured!\n"; 
-				}
+		if (i.getType()->isPointerTy()){
+			errs() << "    Found a pointer!" << "\n";
+			if (PointerMayBeCaptured(&i, false, false)){ 
+				errs() << "    This pointer " << i << " is captured!\n";	
 			}
-		}
-		if (i.getOpcode() == 47){ // 47 corresponds to ptrtoint
-				if (PointerMayBeCaptured(&i, false, false)){ 
-					errs() << "    This pointer " << i << " is captured!\n";	
-				}
 		}
 		for (const Use &U : i.uses()) {
 			errs() << "    user:" << *(U.getUser()) << "; with operandNo:" << U.getOperandNo() << "\n";
